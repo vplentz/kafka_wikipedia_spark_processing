@@ -139,6 +139,15 @@ MAX_WAIT=120
 echo -e "\nWaiting up to $MAX_WAIT seconds for ksqlDB server to start"
 retry $MAX_WAIT host_check_up ksqldb-server || exit 1
 
+
+if [[ "$VIZ" == "true" ]]; then
+  build_viz || exit 1
+fi
+
+echo -e "\nStart additional consumers to read from topics WIKIPEDIANOBOT, WIKIPEDIA_COUNT_GT_1"
+${DIR}/consumers/listen_WIKIPEDIANOBOT.sh
+${DIR}/consumers/listen_WIKIPEDIA_COUNT_GT_1.sh
+
 # Verify Docker containers started
 if [[ $(docker-compose ps) =~ "Exit 137" ]]; then
   echo -e "\nERROR: At least one Docker container did not start properly, see 'docker-compose ps'. Did you increase the memory available to Docker to at least 8 GB (default is 2 GB)?\n"
@@ -170,3 +179,10 @@ DONE! From your browser:
      $C3URL
 
 EOF
+
+if [[ "$VIZ" == "true" ]]; then
+cat << EOF
+  Kibana
+     $kibanaURL
+EOF
+fi
