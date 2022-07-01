@@ -114,6 +114,10 @@ echo
 echo -e "Waiting up to $MAX_WAIT seconds for subject wikipedia.parsed-value (for topic wikipedia.parsed) to be registered in Schema Registry"
 retry $MAX_WAIT host_check_schema_registered || exit 1
 
+# Create other subjects into Confluent Schema Registry
+echo "CREATING NEW SUBJECTS"
+${DIR}/helper/create-subjects.sh
+
 #-------------------------------------------------------------------------------
 
 # Verify Confluent Control Center has started
@@ -126,7 +130,6 @@ echo -e "\nConfluent Control Center modifications:"
 ${DIR}/helper/control-center-modifications.sh
 echo
 
-
 #-------------------------------------------------------------------------------
 
 # Start more containers
@@ -138,6 +141,10 @@ echo
 MAX_WAIT=120
 echo -e "\nWaiting up to $MAX_WAIT seconds for ksqlDB server to start"
 retry $MAX_WAIT host_check_up ksqldb-server || exit 1
+
+# START PYSPARK STREAMING
+echo "\n STARTING PYSPARK STREAMING SERVICE"
+docker-compose up --no-recreate -d pyspark_streaming
 
 
 if [[ "$VIZ" == "true" ]]; then
