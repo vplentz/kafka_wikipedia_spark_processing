@@ -239,6 +239,20 @@ host_check_schema_registered()
   return 0
 }
 
+check_running_spark()
+{
+  RUNNING=$(docker exec pyspark-streaming cat no_bot.out | grep "Running Spark")
+  if [ -z "$RUNNING"]; then
+    return 1
+  fi
+  return 0
+}
+
+restart_pyspark()
+{
+  echo "Something happend, will retry creating PySpark"
+  docker restart pyspark-streaming
+}
 
 mds_login()
 {

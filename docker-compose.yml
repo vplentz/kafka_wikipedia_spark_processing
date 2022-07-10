@@ -1009,7 +1009,9 @@ services:
     container_name: pyspark-streaming
     ports:
       - 8888:8888
+      - 4040:4040
+      - 4041:4041    
     volumes:
       - .:/home/jovyan/work/
     #command: bash
-    command: spark-submit --repositories https://packages.confluent.io/maven --packages org.apache.spark:spark-streaming-kafka-0-10_2.12:3.2.1,org.apache.spark:spark-sql-kafka-0-10_2.12:3.2.1,io.confluent:kafka-schema-registry-client:7.1.1,io.confluent:kafka-avro-serializer:7.1.1,za.co.absa:abris_2.12:6.3.0 work/pyspark_structured_streaming/no_bot_filter.py
+    command: ./work/scripts/pyspark/submit_jobs.sh

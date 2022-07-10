@@ -143,8 +143,14 @@ echo -e "\nWaiting up to $MAX_WAIT seconds for ksqlDB server to start"
 retry $MAX_WAIT host_check_up ksqldb-server || exit 1
 
 # START PYSPARK STREAMING
-echo "\n STARTING PYSPARK STREAMING SERVICE"
+echo -e "\nSTARTING PYSPARK STREAMING SERVICE"
 docker-compose up --no-recreate -d pyspark_streaming
+echo -e "\nWaiting up to 200 seconds for PySpark Apps to start"
+retry 500 check_running_spark || restart_pyspark
+
+retry 500 check_running_spark || exit 1
+
+
 
 
 if [[ "$VIZ" == "true" ]]; then

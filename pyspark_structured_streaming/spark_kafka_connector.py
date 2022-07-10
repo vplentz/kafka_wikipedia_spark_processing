@@ -7,6 +7,8 @@ class SparkKafkaConnector:
     def __init__(self, app_name: str):
         self.spark_context = SparkSession.builder.appName(app_name).getOrCreate()
         self.confluent_avro = ConfluentAvro()
+        print('SPARK CONTEXT')
+        print(self.spark_context)
     
     def read_from_kafka(self, topic, starting_offsets='earliest'):
         wikipedia_df = self.spark_context.readStream.format('kafka')\
@@ -21,8 +23,10 @@ class SparkKafkaConnector:
         df = df.withColumn('value', self.confluent_avro.to_avro(col('value'), topic))
         df.writeStream.format('kafka')\
         .option("kafka.bootstrap.servers", 'kafka1:12091') \
-        .option("checkpointLocation", "./checkpoints/") \
+        .option("checkpointLocation", f"./checkpoints/{topic}/") \
         .option("topic", topic) \
         .outputMode("append") \
         .start()
-        self.spark_context.streams.awaitAnyTermination()  
+
+    def await_any_termination(self):
+        self.spark_context.streams.awaitAnyTermination()

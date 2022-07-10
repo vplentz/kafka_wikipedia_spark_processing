@@ -11,5 +11,9 @@ class BotFilter:
     def filter_bot(df, bot):
         return df.filter((col('value.bot') == bot) 
                          & (col('value.length.new').isNotNull()) 
-                         & (col('value.length.new').isNotNull()))
-    
+                         & (col('value.length.new').isNotNull()))    
+    @staticmethod
+    def transform(df, bot):
+        df = BotFilter.create_bytechenge_col(df)
+        df = BotFilter.filter_bot(df, bot)
+        return df
