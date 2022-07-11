@@ -1,18 +1,32 @@
 # Kafka + Spark Structured Streaming + ElasticSearch (Kibana)
 
-This project does the same as the original [repo](https://github.com/confluentinc/cp-demo), but changes the streamming processing engine from KSQL and Kafka Streams to Spark Structured Streaming.
+This project modifies [Confluent WIKIPEDIA repo](https://github.com/confluentinc/cp-demo), changing the streamming processing engine from KSQL and Kafka Streams to Spark Structured Streaming.
+
+|![Old Architecture](/docs/images/old_architecture.png)|
+|:--:|
+| Old Architecture using KStreams and K-SQL to process data.  <i>Image from [Confluent Repo](https://github.com/confluentinc/cp-demo)</i>|
+
+
+
+|![New Architecture](/docs/images/new_architecture.jpeg)|
+|:--:|
+| New Architecure using PySpark to process data (the ElasticSearch and Kibana still exists if you wanna use them)|
+
 
 ## Overview
 
-The use case is a Kafka event streaming application for real-time edits to real Wikipedia pages.
+I was studying about Kafka using videos and tutorials from Confluent, eventually, when digging around their tutorials and videos I've got into the Wikipedia repository. 
 
-Wikimedia's EventStreams publishes a continuous stream of real-time edits happening to real wiki pages.
-Using Kafka Connect, a Kafka source connector `kafka-connect-sse` streams raw messages for the server sent events (SSE), and a custom Kafka Connect transform `kafka-connect-json-schema` transforms these messages and then the messages are written to a Kafka cluster.
+The Wikipedia repository lifts a Docker Confluent Kafka Infrastructure (as the old architecture image). It has Kafka Connect sending Wikipedia data to topics, and real-time processing done by K-SQL and a KStreams App, and lastly the transformed data is sent to other topics which are consumed by ElasticSearch Sink Connector.
 
-This example Spark Structured Streamming application for data processing.
+When I looked at this I thought "What if I transform all this data using PySpark Structured Streamming instead of KStreams and K-SQL? This seems a nice home project to do!!"… and that's what this repository is about.
 
-Then a Kafka sink connector `kafka-connect-elasticsearch` streams the data out of Kafka and is materialized into Elasticsearch for analysis by Kibana.
+## UIs:
 
-All data is using Confluent Schema Registry and Avro.
-
-Confluent Control Center is managing and monitoring the deployment.
+After you start the Docker Containers with `./scripts/start.sh` some UIs will be available:
+* localhost:9091 : Confluent Central (user: superUser, pwd: superUser);
+* localhost:5601 : Kibana Dashboards;
+* localhost:4040 : Spark Server Web UI (BotApp);
+* localhost:4041 : Spark Server Web UI (NoBotApp);
+* localhost:4042 : Spark Server Web UI (DomainCountApp);
+* localhost:4043 : Spark Server Web UI (CountGT1App).
