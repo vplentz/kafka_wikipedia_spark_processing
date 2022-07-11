@@ -11,21 +11,24 @@ class SparkKafkaConnector:
         print(self.spark_context)
     
     def read_from_kafka(self, topic, starting_offsets='earliest'):
-        wikipedia_df = self.spark_context.readStream.format('kafka')\
+        df = self.spark_context.readStream.format('kafka')\
         .option('kafka.bootstrap.servers', 'kafka1:12091')\
         .option('subscribe', topic)\
         .option("startingOffsets", starting_offsets)\
         .load()
-        wikipedia_df = wikipedia_df.select(col('value'))
-        return wikipedia_df.withColumn('value', self.confluent_avro.from_avro(col('value'), topic))
+        return df.withColumn('value', self.confluent_avro.from_avro(col('value'), topic))
     
-    def load_to_kafka(self, df, topic):
+    def read_value_from_kafka(self, topic, starting_offsets='earliest'):
+        df = self.read_from_kafka(topic, starting_offsets)
+        return df.select(col('value'))
+
+    def load_to_kafka(self, df, topic, output_mode='append'):
         df = df.withColumn('value', self.confluent_avro.to_avro(col('value'), topic))
         df.writeStream.format('kafka')\
         .option("kafka.bootstrap.servers", 'kafka1:12091') \
         .option("checkpointLocation", f"./checkpoints/{topic}/") \
         .option("topic", topic) \
-        .outputMode("append") \
+        .outputMode(output_mode) \
         .start()
 
     def await_any_termination(self):

@@ -3,7 +3,7 @@ from spark_kafka_connector import SparkKafkaConnector
 
 bot_conn = SparkKafkaConnector('BotApp')
 
-bot_df = bot_conn.read_from_kafka('wikipedia.parsed')
+bot_df = bot_conn.read_value_from_kafka('wikipedia.parsed')
 
 bot_df = BotFilter.transform(bot_df, False)
 
