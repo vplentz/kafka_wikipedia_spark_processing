@@ -1004,7 +1004,7 @@ services:
       KAFKA_REST_CONFLUENT_METADATA_BASIC_AUTH_USER_INFO: 'restAdmin:restAdmin'
 
   pyspark_streaming:
-    image: jupyter/pyspark-notebook
+    image: jupyter/pyspark-notebook:2022-05-27
     hostname: pyspark-streaming
     container_name: pyspark-streaming
     ports:
